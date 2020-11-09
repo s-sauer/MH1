@@ -1,2 +1,4 @@
 plotly
 matplotlib
+scipy
+numpy
