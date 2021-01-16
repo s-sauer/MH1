@@ -1,0 +1,381 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Enzyme_kin_Visualisation</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-01-16"><meta name="DC.source" content="Enzyme_kin_Visualisation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Weiteres Beispiel: Gauss-Glocke 2D</a></li><li><a href="#3">Weiteres Beispiel: Kugelfunktion</a></li><li><a href="#4">Weiteres Beispiel: Lineare Funktion in 2D</a></li><li><a href="#5">Hilfsfunktionen</a></li></ul></div><pre class="codeinput"><span class="comment">% visualisation of enzyme kinetics for (competitive) inhibition</span>
+
+close <span class="string">all</span>
+
+<span class="comment">% 0. Daten v(cP,cI) auf regul&auml;rem Gitter erzeugen</span>
+v_max=0.32;
+KM= 200;
+KI=500;
+
+cS=linspace(0,4000,51);
+cI=linspace(0,4000,51);
+[cSgrid, cIgrid]=meshgrid(cS,cI);
+
+v = v_max * cSgrid ./ (KM*(1+cIgrid/KI)+cSgrid);
+
+<span class="comment">% 1a. Graphenschar mit Parameter cI</span>
+N_par = 10; <span class="comment">% jeden N. Wert des Parameters verwenden</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Graphenschar mit Parameter c_I'</span>)
+plot(cS, v(1:N_par:end,:), <span class="string">'LineWidth'</span>, 2)
+
+
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'v [mmol/s]'</span>)
+par_labels = compose(<span class="string">'%d'</span>,cI(1:10:end));
+leg = legend(par_labels);
+title(leg, <span class="string">'c_I [mmol/l]'</span>)
+
+<span class="comment">% 1b. Graphenschar mit Parameter cS</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Graphenschar mit Parameter c_S'</span>)
+plot(cI, v(:,1:10:end),<span class="string">'LineWidth'</span>, 2)
+
+xlabel(<span class="string">'c_I [mmol/l]'</span>)
+ylabel(<span class="string">'v [mmol/s]'</span>)
+par_labels = compose(<span class="string">'%d'</span>,cS(1:10:end));
+leg = legend(par_labels);
+title(leg, <span class="string">'c_S [mmol/l]'</span>)
+
+<span class="comment">% 2. Surface Plot</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Surface plot'</span>)
+surf(cSgrid, cIgrid, v, <span class="string">'EdgeColor'</span>, <span class="string">'None'</span>)
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'c_I [mmol/l]'</span>)
+zlabel(<span class="string">'v [mmol/s]'</span>)
+cb = colorbar();
+title(cb,<span class="string">'v [mmol/s]'</span>)
+grid <span class="string">off</span>
+
+hold <span class="string">on</span> <span class="comment">% add 3D line plots</span>
+plot3(cSgrid(:,1:N_par:end), <span class="keyword">...</span>
+    cIgrid(:,1:N_par:end), <span class="keyword">...</span>
+    v(:,1:N_par:end), <span class="string">'k-'</span>, <span class="string">'LineWidth'</span>, 2);
+plot3(cSgrid(1:N_par:end,:)', <span class="keyword">...</span>
+    cIgrid(1:N_par:end,:)', <span class="keyword">...</span>
+    v(1:N_par:end,:)', <span class="string">'k-'</span>, <span class="string">'LineWidth'</span>, 2);
+hold <span class="string">off</span>
+
+<span class="comment">% 3. Heat map</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Heat map'</span>)
+imagesc(cI, cS, v)
+set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>); <span class="comment">% required for correct y axis orientation</span>
+cb = colorbar();
+title(cb,<span class="string">'v [mmol/s]'</span>)
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'c_I [mmol/l]'</span>)
+
+<span class="comment">% 4. Colored contour plot</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Colored contour plot'</span>)
+levels = linspace(0,v_max,17); <span class="comment">% no. of contour lines</span>
+contourf(cI, cS, v, levels)
+cb = colorbar();
+title(cb,<span class="string">'v [mmol/s]'</span>)
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'c_I [mmol/l]'</span>)
+
+<span class="comment">% 5. Labeled contour plot</span>
+figure(<span class="string">'Name'</span>, <span class="string">'Labeled contour plot'</span>)
+contour(cI, cS, v, levels, <span class="string">'ShowText'</span>,<span class="string">'on'</span>)
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'c_I [mmol/l]'</span>)
+
+<span class="comment">% 6. Contour plot 3d atop surface plot</span>
+
+figure(<span class="string">'Name'</span>, <span class="string">'3d contour plot'</span>)
+contour3(cI, cS, v, levels, <span class="string">'ShowText'</span>,<span class="string">'on'</span>, <span class="string">'Linewidth'</span>,2)
+hold <span class="string">on</span>
+surf(cSgrid, cIgrid, v, <span class="string">'EdgeColor'</span>, <span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.5)
+xlabel(<span class="string">'c_S [mmol/l]'</span>)
+ylabel(<span class="string">'c_I [mmol/l]'</span>)
+zlabel(<span class="string">'v [mmol/s]'</span>)
+cb = colorbar();
+title(cb,<span class="string">'v [mmol/s]'</span>)
+grid <span class="string">off</span>
+</pre><img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_01.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_02.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_03.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_04.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_05.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_06.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_07.png" alt=""> <h2 id="2">Weiteres Beispiel: Gauss-Glocke 2D</h2><pre class="codeinput">weitere_Beispiele(@Gauss)
+</pre><img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_08.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_09.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_10.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_11.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_12.png" alt=""> <h2 id="3">Weiteres Beispiel: Kugelfunktion</h2><pre class="codeinput">weitere_Beispiele(@Kugel)
+</pre><img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_13.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_14.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_15.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_16.png" alt=""> <h2 id="4">Weiteres Beispiel: Lineare Funktion in 2D</h2><pre class="codeinput">weitere_Beispiele(@LinFun)
+</pre><img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_17.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_18.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_19.png" alt=""> <img vspace="5" hspace="5" src="Enzyme_kin_Visualisation_20.png" alt=""> <h2 id="5">Hilfsfunktionen</h2><pre class="codeinput"><span class="keyword">function</span> z=Kugel(x,y)
+    z = sqrt(1-(x.^2+y.^2));
+    z(x.^2+y.^2&gt;1)=NaN;
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> z=Gauss(x,y)
+    z = exp(-(x.^2+y.^2)/2/.2);
+<span class="keyword">end</span>
+
+
+<span class="keyword">function</span> z=LinFun(x,y)
+    z = 2*x - 3*y;
+<span class="keyword">end</span>
+
+
+<span class="keyword">function</span> weitere_Beispiele(function_handle)
+    x = linspace(-1, 1, 1001);
+    y = linspace(-1, 1, 1001);
+    [xGrid, yGrid] = meshgrid(x,y);
+
+    zGrid = function_handle(xGrid, yGrid);
+
+    <span class="comment">% 1. Graphenschar mit Parameter y</span>
+    figure(<span class="string">'Name'</span>, <span class="string">'Graphenschar mit Parameter y'</span>)
+    plot(x, zGrid(1:50:end,:)',<span class="string">'LineWidth'</span>, 2)
+
+    xlabel(<span class="string">'x'</span>)
+    ylabel(<span class="string">'z'</span>)
+    par_labels = compose(<span class="string">'%d'</span>,y(1:50:end));
+    leg = legend(par_labels);
+    title(leg, <span class="string">'y'</span>)
+
+    <span class="comment">% 2. Surface Plot</span>
+    figure(<span class="string">'Name'</span>, <span class="string">'Surface plot'</span>)
+    surf(xGrid, yGrid, zGrid, <span class="string">'EdgeColor'</span>, <span class="string">'None'</span>)
+    xlabel(<span class="string">'x'</span>)
+    ylabel(<span class="string">'y'</span>)
+    zlabel(<span class="string">'z'</span>)
+    cb = colorbar();
+    title(cb,<span class="string">'z'</span>)
+
+    <span class="comment">% 3. Colored contour plot</span>
+    figure(<span class="string">'Name'</span>, <span class="string">'Colored contour plot'</span>)
+    contourf(xGrid, yGrid, zGrid)
+    cb = colorbar();
+    xlabel(<span class="string">'x'</span>)
+    ylabel(<span class="string">'y'</span>)
+
+    <span class="comment">% 4. Labeled contour plot</span>
+    figure(<span class="string">'Name'</span>, <span class="string">'Labeled contour plot'</span>)
+    contour(xGrid, yGrid, zGrid, <span class="string">'ShowText'</span>,<span class="string">'on'</span>)
+    xlabel(<span class="string">'x'</span>)
+    ylabel(<span class="string">'y'</span>)
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% visualisation of enzyme kinetics for (competitive) inhibition
+
+close all
+
+% 0. Daten v(cP,cI) auf regulärem Gitter erzeugen
+v_max=0.32;
+KM= 200;
+KI=500;
+
+cS=linspace(0,4000,51);
+cI=linspace(0,4000,51);
+[cSgrid, cIgrid]=meshgrid(cS,cI);
+
+v = v_max * cSgrid ./ (KM*(1+cIgrid/KI)+cSgrid);
+
+% 1a. Graphenschar mit Parameter cI
+N_par = 10; % jeden N. Wert des Parameters verwenden
+figure('Name', 'Graphenschar mit Parameter c_I')
+plot(cS, v(1:N_par:end,:), 'LineWidth', 2)
+
+
+xlabel('c_S [mmol/l]')
+ylabel('v [mmol/s]')
+par_labels = compose('%d',cI(1:10:end));
+leg = legend(par_labels);
+title(leg, 'c_I [mmol/l]')
+
+% 1b. Graphenschar mit Parameter cS
+figure('Name', 'Graphenschar mit Parameter c_S')
+plot(cI, v(:,1:10:end),'LineWidth', 2)
+
+xlabel('c_I [mmol/l]')
+ylabel('v [mmol/s]')
+par_labels = compose('%d',cS(1:10:end));
+leg = legend(par_labels);
+title(leg, 'c_S [mmol/l]')
+
+% 2. Surface Plot
+figure('Name', 'Surface plot')
+surf(cSgrid, cIgrid, v, 'EdgeColor', 'None')
+xlabel('c_S [mmol/l]')
+ylabel('c_I [mmol/l]')
+zlabel('v [mmol/s]')
+cb = colorbar();
+title(cb,'v [mmol/s]')
+grid off
+
+hold on % add 3D line plots
+plot3(cSgrid(:,1:N_par:end), ...
+    cIgrid(:,1:N_par:end), ...
+    v(:,1:N_par:end), 'k-', 'LineWidth', 2);
+plot3(cSgrid(1:N_par:end,:)', ...
+    cIgrid(1:N_par:end,:)', ...
+    v(1:N_par:end,:)', 'k-', 'LineWidth', 2);
+hold off
+
+% 3. Heat map
+figure('Name', 'Heat map')
+imagesc(cI, cS, v)
+set(gca,'YDir','normal'); % required for correct y axis orientation
+cb = colorbar();
+title(cb,'v [mmol/s]')
+xlabel('c_S [mmol/l]')
+ylabel('c_I [mmol/l]')
+
+% 4. Colored contour plot
+figure('Name', 'Colored contour plot')
+levels = linspace(0,v_max,17); % no. of contour lines
+contourf(cI, cS, v, levels)
+cb = colorbar();
+title(cb,'v [mmol/s]')
+xlabel('c_S [mmol/l]')
+ylabel('c_I [mmol/l]')
+
+% 5. Labeled contour plot
+figure('Name', 'Labeled contour plot')
+contour(cI, cS, v, levels, 'ShowText','on')
+xlabel('c_S [mmol/l]')
+ylabel('c_I [mmol/l]')
+
+% 6. Contour plot 3d atop surface plot
+
+figure('Name', '3d contour plot')
+contour3(cI, cS, v, levels, 'ShowText','on', 'Linewidth',2)
+hold on
+surf(cSgrid, cIgrid, v, 'EdgeColor', 'None','FaceAlpha',0.5)
+xlabel('c_S [mmol/l]')
+ylabel('c_I [mmol/l]')
+zlabel('v [mmol/s]')
+cb = colorbar();
+title(cb,'v [mmol/s]')
+grid off
+
+
+%% Weiteres Beispiel: Gauss-Glocke 2D
+weitere_Beispiele(@Gauss)
+
+%% Weiteres Beispiel: Kugelfunktion
+weitere_Beispiele(@Kugel)
+
+%% Weiteres Beispiel: Lineare Funktion in 2D
+weitere_Beispiele(@LinFun)
+
+%% Hilfsfunktionen
+function z=Kugel(x,y)
+    z = sqrt(1-(x.^2+y.^2));
+    z(x.^2+y.^2>1)=NaN;
+end
+
+function z=Gauss(x,y)
+    z = exp(-(x.^2+y.^2)/2/.2);
+end
+
+
+function z=LinFun(x,y)
+    z = 2*x - 3*y;
+end
+
+
+function weitere_Beispiele(function_handle)
+    x = linspace(-1, 1, 1001);
+    y = linspace(-1, 1, 1001);
+    [xGrid, yGrid] = meshgrid(x,y);
+
+    zGrid = function_handle(xGrid, yGrid);
+
+    % 1. Graphenschar mit Parameter y
+    figure('Name', 'Graphenschar mit Parameter y')
+    plot(x, zGrid(1:50:end,:)','LineWidth', 2)
+
+    xlabel('x')
+    ylabel('z')
+    par_labels = compose('%d',y(1:50:end));
+    leg = legend(par_labels);
+    title(leg, 'y')
+
+    % 2. Surface Plot
+    figure('Name', 'Surface plot')
+    surf(xGrid, yGrid, zGrid, 'EdgeColor', 'None')
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
+    cb = colorbar();
+    title(cb,'z')
+
+    % 3. Colored contour plot
+    figure('Name', 'Colored contour plot')
+    contourf(xGrid, yGrid, zGrid)
+    cb = colorbar();
+    xlabel('x')
+    ylabel('y')
+    
+    % 4. Labeled contour plot
+    figure('Name', 'Labeled contour plot')
+    contour(xGrid, yGrid, zGrid, 'ShowText','on')
+    xlabel('x')
+    ylabel('y')
+end
+
+##### SOURCE END #####
+--></body></html>
