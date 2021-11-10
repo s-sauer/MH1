@@ -101,6 +101,12 @@ weitere_Beispiele(@Kugel)
 %% Weiteres Beispiel: Lineare Funktion in 2D
 weitere_Beispiele(@LinFun)
 
+%% Weiteres Beispiel: Volumen Zylinder
+weitere_Beispiele(@VolZylinder)
+
+%% Weiteres Beispiel: Berg
+weitere_Beispiele(@Berg)
+
 %% Hilfsfunktionen
 function z=Kugel(x,y)
     z = sqrt(1-(x.^2+y.^2));
