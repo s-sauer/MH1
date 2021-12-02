@@ -20,24 +20,30 @@ def pmatrix(a):
 # ab hier nix verändern
 
 
-def gen_A_x_b(Anzahl=3, max_n=5, max_m=5, min_zahl=-5, max_zahl=+5):
+def gen_A_x_b(Anzahl=3, max_n=5, max_m=5, min_zahl=-5, max_zahl=+5, x_as_Matrix=False):
     # generates dict of triples: matrix A, vector x and r.h.s. vector b
     # for each value of dict, A*x=b holds true
     # keys are indices
 
     A_x_b_dict = {}
 
-    for k in range(Anzahl):
+    for i in range(Anzahl):
         #print('Aufgabe Nr.', k+1)
         
+
         n = np.random.randint(2, max_n+1)
         m = np.random.randint(2, max_m+1)
+        if x_as_Matrix:
+            k = np.random.randint(2, max_m+1)
+        else:
+            k = 1
+
         A = np.random.randint(min_zahl,max_zahl,[n,m])
-        x = np.random.randint(min_zahl,max_zahl,[m,1])
+        x = np.random.randint(min_zahl,max_zahl,[m,k])
         
         b = np.matmul(A,x)
 
-        A_x_b_dict[k+1]=(A,x,b)
+        A_x_b_dict[i+1]=(A,x,b)
 
     return A_x_b_dict
 
